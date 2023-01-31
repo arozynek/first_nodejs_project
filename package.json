@@ -1,0 +1,23 @@
+{
+  "name": "first_node_js_project",
+  "version": "1.0.0",
+  "description": "Node.js course",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arozynek/first_nodejs_project.git"
+  },
+  "author": "Anna Rozynek",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arozynek/first_nodejs_project/issues"
+  },
+  "homepage": "https://github.com/arozynek/first_nodejs_project#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
