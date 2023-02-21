@@ -8,6 +8,8 @@ router.get("/", (req, res, next) => {
     pageTitle: "Shop",
     prods: products,
     hasProducts: products.length > 0,
+    activeShop: true,
+    productCSS: true,
   });
 });
 
