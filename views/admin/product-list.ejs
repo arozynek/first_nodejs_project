@@ -4,7 +4,7 @@
 <body>
  <%- include('../includes/header.ejs') %>
   <main>
-    <h1>Admin product list</h1>
+    <h1>List of products</h1>
     <% if (prods.length > 0) { %>
     <div class="grid">
       <% for (let prod of prods) { %>
@@ -14,18 +14,21 @@
         </header>
         <div class="card__image">
           <img
-            src="https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png"
-            alt="A Book"
+            src=<%= prod.imageUrl %>
+            alt=<%= prod.title %>
           />
         </div>
         <div class="card__content">
-          <h2 class="product__price">$19.99</h2>
+          <h2 class="product__price">$<%= prod.price %></h2>
           <p class="product__description">
-            A very interesting book about so many even more interesting things!
+            <%= prod.description %>
           </p>
         </div>
         <div class="card__actions">
-          <button class="btn">Add to Cart</button>
+          <a href="/edit-product/" class="btn">Edit</a href="/edit-product/">
+            <form  action="/admin/delete-prod" method="POST">
+              <button class="btn" type="submit">Delete</button>
+          </form>
         </div>
       </article>
       <% } %>

@@ -1,1 +1,8 @@
-[{"title":"book"},{"title":"second book"},{"title":"hey"}]
+[
+  {
+    "title": "Snowboard 2 ",
+    "imageUrl": "https://media.istockphoto.com/id/1058889910/photo/snowboard-with-strap-in-bindings-3d-rendering-isolated-on-white-background.jpg?s=612x612&w=0&k=20&c=wxStVmKULRTjAYHIVtY88YXPZ1P7JMbC86HfKbG1NNw=",
+    "description": "Unknown brand snowboard",
+    "price": "60"
+  }
+]
