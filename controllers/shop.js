@@ -1,11 +1,21 @@
 const Product = require("../models/product");
 
-exports.getProduct = (req, res, next) => {
+exports.getProducts = (req, res, next) => {
   Product.fetchAll((products) => {
     res.render("shop/product-list", {
       prods: products,
       pageTitle: "All products in shop",
       path: "/products",
+    });
+  });
+};
+exports.getProduct = (req, res, next) => {
+  const prodId = req.params.productId;
+  Product.findById(prodId, (product) => {
+    res.render(`shop/product-detail`, {
+      prod: product,
+      pageTitle: `${prodId} product`,
+      path: `/products/${prodId}`,
     });
   });
 };
