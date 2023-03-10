@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const notifier = require("node-notifier");
+const Cart = require("./cart");
 
 const p = path.join(
   path.dirname(require.main.filename),
@@ -49,14 +50,14 @@ module.exports = class Product {
   static deleteById(id) {
     getProdsFromFile((products) => {
       if (id) {
-        const existingProductIndex = products.findIndex(
-          (prod) => prod.id === id
-        );
-        const deletedProducts = [...products];
-        deletedProducts.splice(existingProductIndex, 1);
+        // const deletedProducts = [...products];
+        // deletedProducts.splice(existingProductIndex, 1);
+        const product = products.find((prod) => prod.id === id);
+        const deletedProducts = products.filter((prod) => prod.id !== id);
         fs.writeFile(p, JSON.stringify(deletedProducts), (err) => {
           console.log(err);
         });
+        Cart.deleteProduct(id, product.price);
       } else {
         notifier.notify({
           title: "Something went wrong..",
