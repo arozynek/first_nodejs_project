@@ -1,7 +1,7 @@
 const path = require("path");
-const { express } = require("express");
+const express = require("express");
 const bodyParser = require("body-parser");
-const { db } = require("./helper/database");
+const sequelize = require("./helper/database");
 
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
@@ -19,4 +19,9 @@ app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(errorCtrl.getError);
 
-app.listen(3000);
+sequelize
+  .sync()
+  .then((result) => {
+    app.listen(3000);
+  })
+  .catch((err) => console.log(err));

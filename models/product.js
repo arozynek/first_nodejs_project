@@ -1,5 +1,5 @@
 const { Sequelize, DataTypes } = require("sequelize");
-const { sequelize } = require("../helper/database");
+const sequelize = require("../helper/database");
 const Product = sequelize.define("product", {
   id: {
     type: DataTypes.INTEGER,
@@ -24,4 +24,5 @@ const Product = sequelize.define("product", {
     allowNull: false,
   },
 });
+
 module.exports = Product;
