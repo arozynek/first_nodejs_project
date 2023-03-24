@@ -13,12 +13,23 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const description = req.body.description;
   const price = req.body.price;
-  Product.create({
-    title: title,
-    price: price,
-    imageUrl: imageUrl,
-    description: description,
-  })
+  // const userId = req.user.id;
+  // Product.create({
+  //   title: title,
+  //   price: price,
+  //   imageUrl: imageUrl,
+  //   description: description,
+  //   userId: userId,
+  // })
+  // dzięki przypisaniu product belongs to user możemy użyć metod wynikających z associations
+  req.user
+    .createProduct({
+      title: title,
+      price: price,
+      imageUrl: imageUrl,
+      description: description,
+      userId: req.user.id,
+    })
     .then((result) => {
       console.log(result);
       res.redirect("products");
@@ -32,8 +43,10 @@ exports.getEditProduct = (req, res, next) => {
     res.redirect("/");
   }
   const prodId = req.params.productId;
-  Product.findByPk(prodId)
-    .then((product) => {
+  req.user
+    .getProducts({ where: { id: prodId } })
+    .then((products) => {
+      const product = products[0];
       if (!product) {
         return res.redirect("/error");
       }
@@ -72,7 +85,8 @@ exports.postDeleteProduct = (req, res, next) => {
 };
 
 exports.getAdminProduct = (req, res, next) => {
-  Product.findAll()
+  req.user
+    .getProducts()
     .then((products) => {
       res.render("admin/product-list", {
         prods: products,
