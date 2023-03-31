@@ -1,5 +1,5 @@
 const Product = require("../models/product");
-const Cart = require("../models/cart");
+const Order = require("../models/order");
 // const User = require("../models/user");
 
 exports.getProducts = (req, res, next) => {
@@ -87,7 +87,8 @@ exports.postCart = async (req, res, next) => {
         return { product, qtty };
       } else {
         const product = await Product.findByPk(prodId);
-        return { product, qtty: 1 };
+        qtty = 1;
+        return { product, qtty };
       }
     };
     const { product } = await setProdAndQtty();
@@ -104,17 +105,36 @@ exports.postCart = async (req, res, next) => {
   // });
   // res.redirect("/cart");
 };
-
-exports.getOrders = (req, res, next) => {
-  res.render("shop/orders", {
-    path: "/orders",
-    pageTitle: "Your orders",
-  });
+exports.postOrder = async (req, res, next) => {
+  try {
+    const cart = await req.user.getCart();
+    const products = await cart.getProducts();
+    const order = await req.user.createOrder();
+    await order
+      .addProducts(
+        products.map((product) => {
+          product.orderItem = { quantity: product.cartItem.quantity };
+          return product;
+        })
+      )
+      .then(() => {
+        return cart.setProducts(null);
+      });
+    res.redirect("/orders");
+  } catch (err) {
+    console.log(err);
+  }
 };
 
-exports.getCheckout = (req, res, next) => {
-  res.render("shop/checkout", {
-    path: "/checkout",
-    pageTitle: "Checkout",
-  });
+exports.getOrders = (req, res, next) => {
+  req.user
+    .getOrders({ include: ["products"] })
+    .then((orders) => {
+      res.render("shop/orders", {
+        path: "/orders",
+        pageTitle: "Your orders",
+        orders: orders,
+      });
+    })
+    .catch((err) => console.log(err));
 };
