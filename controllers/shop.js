@@ -56,10 +56,19 @@ exports.getCart = (req, res, next) => {
 
 exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.findById(prodId, (product) => {
-    Cart.deleteProduct(prodId, product.price);
-    res.redirect("/cart");
-  });
+  req.user
+    .getCart()
+    .then((cart) => {
+      return cart.getProducts({ where: { id: prodId } });
+    })
+    .then((products) => {
+      const product = products[0];
+      return product.cartItem.destroy();
+    })
+    .then((resuult) => {
+      res.redirect("/cart");
+    })
+    .catch((err) => console.log(err));
 };
 exports.postCart = async (req, res, next) => {
   try {
@@ -70,7 +79,7 @@ exports.postCart = async (req, res, next) => {
       where: { id: prodId },
     });
     const setProdAndQtty = async () => {
-      if (fetchedProduct) {
+      if (fetchedProduct.length) {
         const product = fetchedProduct[0];
         console.log(product);
         const oldQtty = product.cartItem.quantity;
@@ -85,7 +94,7 @@ exports.postCart = async (req, res, next) => {
     await fetchedCart.addProduct(product, {
       through: { quantity: qtty },
     });
-    await res.redirect("/");
+    await res.redirect("/cart");
   } catch (err) {
     console.log(err);
   }
