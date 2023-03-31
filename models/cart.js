@@ -10,6 +10,10 @@ Cart.init(
       allowNull: false,
       primaryKey: true,
     },
+    userId: {
+      type: DataTypes.INTEGER,
+      unique: true,
+    },
   },
   { sequelize, modelName: "Cart" }
 );

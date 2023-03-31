@@ -1,5 +1,6 @@
 const Product = require("../models/product");
 const Cart = require("../models/cart");
+// const User = require("../models/user");
 
 exports.getProducts = (req, res, next) => {
   Product.findAll()
@@ -38,25 +39,19 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  Cart.getCart((cart) => {
-    Product.fetchAll((products) => {
-      const cartProducts = [];
-      for (let product of products) {
-        const cartProductData = cart.products.find(
-          (prod) => prod.id === product.id
-        );
-        if (cartProductData) {
-          cartProducts.push({ productData: product, qty: cartProductData.qty });
-        }
-      }
-      res.render("shop/cart", {
-        products: cartProducts,
-        cart: cart,
-        path: "/cart",
-        pageTitle: "Your cart",
+  req.user
+    .getCart()
+    .then((cart) => {
+      return cart.getProducts().then((products) => {
+        res.render("shop/cart", {
+          products: products,
+          cart: cart,
+          path: "/cart",
+          pageTitle: "Your cart",
+        });
       });
-    });
-  });
+    })
+    .catch((err) => console.log(err));
 };
 
 exports.postCartDeleteProduct = (req, res, next) => {
@@ -66,12 +61,39 @@ exports.postCartDeleteProduct = (req, res, next) => {
     res.redirect("/cart");
   });
 };
-exports.postCart = (req, res, next) => {
-  const prodId = req.body.productId;
-  Product.findById(prodId, (product) => {
-    Cart.addProduct(product.id, product.price);
-  });
-  res.redirect("/cart");
+exports.postCart = async (req, res, next) => {
+  try {
+    const prodId = req.body.productId;
+    let qtty;
+    const fetchedCart = await req.user.getCart();
+    const fetchedProduct = await fetchedCart.getProducts({
+      where: { id: prodId },
+    });
+    const setProdAndQtty = async () => {
+      if (fetchedProduct) {
+        const product = fetchedProduct[0];
+        console.log(product);
+        const oldQtty = product.cartItem.quantity;
+        qtty = oldQtty + 1;
+        return { product, qtty };
+      } else {
+        const product = await Product.findByPk(prodId);
+        return { product, qtty: 1 };
+      }
+    };
+    const { product } = await setProdAndQtty();
+    await fetchedCart.addProduct(product, {
+      through: { quantity: qtty },
+    });
+    await res.redirect("/");
+  } catch (err) {
+    console.log(err);
+  }
+
+  // Product.findById(prodId, (product) => {
+  //   Cart.addProduct(product.id, product.price);
+  // });
+  // res.redirect("/cart");
 };
 
 exports.getOrders = (req, res, next) => {
